@@ -1,44 +1,165 @@
 <!DOCTYPE html>
-
-<html>
-
+<html lang="en">
 <head>
-	<link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <title>Tic Tac Toe</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: #f4f4f9;
+    }
+    .container {
+      text-align: center;
+    }
+    #inputdata {
+      margin-bottom: 20px;
+    }
+    #inputdata input {
+      padding: 8px;
+      margin: 5px;
+    }
+    #submit {
+      padding: 8px 15px;
+      cursor: pointer;
+    }
+    .game-section {
+      display: none;
+    }
+    h1 {
+      margin-bottom: 15px;
+    }
+    .message {
+      margin-bottom: 20px;
+      font-weight: bold;
+      font-size: 18px;
+      color: #333;
+    }
+    #board {
+      display: grid;
+      grid-template-columns: repeat(3, 80px);
+      grid-template-rows: repeat(3, 80px);
+      gap: 5px;
+      justify-content: center;
+    }
+    .cell {
+      width: 80px;
+      height: 80px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 28px;
+      font-weight: bold;
+      border: 2px solid #333;
+      cursor: pointer;
+      background: white;
+    }
+    .cell:hover {
+      background: #f0f0f0;
+    }
+  </style>
 </head>
-
 <body>
-	<div class="container">
-		<h1>Tic Tac Toe</h1>
-		<div id="inputdata">
-		<lebel>Player 1</lebel>
-		<input id="player-1" placeholder="enter name">
-		<br>
-		<lebel>Player 2</lebel>
-		<input id="player-2" placeholder="enter name">
-		<br><br>
-		<button type="submit" id="submit">Start Game</button>
-		</div>
+  <div class="container">
 
-		<div class="game-section">
-            <h2 id="message" class="message"></h2>
-            <div class="board" id="board">
-                <div id="0"></div>
-                <div id="1"></div>
-                <div id="2"></div>
-                <div id="3"></div>
-                <div id="4"></div>
-                <div id="5"></div>
-                <div id="6"></div>
-                <div id="7"></div>
-                <div id="8"></div>
-            </div>
-        </div>
+    <!-- Input section -->
+    <div id="inputdata">
+      <input type="text" id="player-1" placeholder="Enter Player 1 name">
+      <input type="text" id="player-2" placeholder="Enter Player 2 name">
+      <button id="submit">Submit</button>
+    </div>
 
-	</div>
-	<!-- the entire body must be written by student -->
-    <script type="text/javascript" src="./script.js">
-</script>
+    <!-- Game Section -->
+    <div class="game-section">
+      <h1>Tic Tac Toe</h1>
+      <div class="message" id="message"></div>
+      <div id="board">
+        <!-- 9 cells -->
+        <div class="cell" id="0"></div>
+        <div class="cell" id="1"></div>
+        <div class="cell" id="2"></div>
+        <div class="cell" id="3"></div>
+        <div class="cell" id="4"></div>
+        <div class="cell" id="5"></div>
+        <div class="cell" id="6"></div>
+        <div class="cell" id="7"></div>
+        <div class="cell" id="8"></div>
+      </div>
+    </div>
+  </div>
 
+  <script>
+    const inputSection = document.querySelector('#inputdata');
+    const gameSection = document.querySelector('.game-section');
+    const messageElement = document.getElementById('message');
+
+    let players = [];
+    let currentPlayer = 0;
+    let board = Array(9).fill(null);
+    let winnerdata = null;
+
+    const winningCombination = [
+      [0,1,2],[3,4,5],[6,7,8],
+      [0,3,6],[1,4,7],[2,5,8],
+      [0,4,8],[2,4,6]
+    ];
+
+    function handleCellClick(index) {
+      if (board[index] || checkWinner()) return;
+
+      board[index] = currentPlayer === 0 ? 'X' : 'O';
+      document.getElementById(index).textContent = board[index];
+
+      if (checkWinner()) {
+        messageElement.textContent = `${players[currentPlayer]} congratulations you won!`;
+        winnerdata.forEach(i => {
+          document.getElementById(`${i}`).style.backgroundColor = "violet";
+        });
+      } else if (board.every(cell => cell)) {
+        messageElement.textContent = "It's a Draw!";
+      } else {
+        currentPlayer = 1 - currentPlayer;
+        messageElement.textContent = `${players[currentPlayer]}, you're up`;
+      }
+    }
+
+    function checkWinner() {
+      const symbol = currentPlayer === 0 ? 'X' : 'O';
+      return winningCombination.some(combination => {
+        if (combination.every(i => board[i] === symbol)) {
+          winnerdata = combination;
+          return true;
+        }
+        return false;
+      });
+    }
+
+    document.getElementById("submit").addEventListener("click", () => {
+      const player1 = document.getElementById("player-1").value.trim();
+      const player2 = document.getElementById("player-2").value.trim();
+
+      if (!player1 || !player2) return;
+
+      players = [player1, player2];
+      currentPlayer = 0;
+      board.fill(null);
+      winnerdata = null;
+
+      // Reset board
+      for (let i = 0; i < 9; i++) {
+        const cell = document.getElementById(i);
+        cell.textContent = "";
+        cell.style.backgroundColor = "white";
+        cell.onclick = () => handleCellClick(i);
+      }
+
+      inputSection.style.display = "none";
+      gameSection.style.display = "block";
+      messageElement.textContent = `${players[currentPlayer]}, you're up`;
+    });
+  </script>
 </body>
-
 </html>
