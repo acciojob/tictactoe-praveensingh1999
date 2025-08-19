@@ -37,7 +37,7 @@ function handleCellClick(index){
 }
 
 function checkWinner() {
-    const symbol = currentPlayer === 0 ? 'X' : 'O';
+    const symbol = currentPlayer === 0 ? 'x' : 'o';
     return winningCombination.some(combination => {
         if (combination.every(index => board[index] === symbol)) {
             winnerdata = combination; 
