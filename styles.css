@@ -1,1 +1,14 @@
 /*  your css code here. If applicable */
+.board{
+	display: grid;
+	grid-template-columns: 100px 100px 100px;
+	
+}.board > div{
+	border: 1px solid black;
+	background-color: lightpink;
+	
+	height:100px;
+}
+.game-section{
+    display: none;
+}
