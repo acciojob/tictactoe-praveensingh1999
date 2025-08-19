@@ -6,79 +6,57 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      background: #f4f4f9;
+      text-align: center;
+      margin: 20px;
     }
     .container {
-      text-align: center;
+      max-width: 400px;
+      margin: auto;
     }
     #inputdata {
       margin-bottom: 20px;
     }
-    #inputdata input {
-      padding: 8px;
-      margin: 5px;
-    }
-    #submit {
-      padding: 8px 15px;
-      cursor: pointer;
-    }
-    .game-section {
-      display: none;
-    }
-    h1 {
-      margin-bottom: 15px;
-    }
-    .message {
-      margin-bottom: 20px;
-      font-weight: bold;
-      font-size: 18px;
-      color: #333;
-    }
     #board {
       display: grid;
-      grid-template-columns: repeat(3, 80px);
-      grid-template-rows: repeat(3, 80px);
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
       gap: 5px;
       justify-content: center;
+      margin: 20px auto;
     }
     .cell {
-      width: 80px;
-      height: 80px;
+      width: 100px;
+      height: 100px;
+      font-size: 2rem;
       display: flex;
-      justify-content: center;
       align-items: center;
-      font-size: 28px;
-      font-weight: bold;
-      border: 2px solid #333;
+      justify-content: center;
+      border: 2px solid #000;
       cursor: pointer;
-      background: white;
+      user-select: none;
     }
-    .cell:hover {
-      background: #f0f0f0;
+    .message {
+      margin-top: 15px;
+      font-size: 1.2rem;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div class="container">
-
     <!-- Input section -->
     <div id="inputdata">
-      <input type="text" id="player-1" placeholder="Enter Player 1 name">
-      <input type="text" id="player-2" placeholder="Enter Player 2 name">
+      <h2>Enter Players</h2>
+      <input type="text" id="player1" placeholder="Player 1 name">
+      <input type="text" id="player2" placeholder="Player 2 name">
       <button id="submit">Submit</button>
     </div>
 
-    <!-- Game Section -->
-    <div class="game-section">
+    <!-- Game section -->
+    <div class="game-section" style="display:none;">
       <h1>Tic Tac Toe</h1>
       <div class="message" id="message"></div>
       <div id="board">
-        <!-- 9 cells -->
-        <div class="cell" id="0"></div>
         <div class="cell" id="1"></div>
         <div class="cell" id="2"></div>
         <div class="cell" id="3"></div>
@@ -87,38 +65,40 @@
         <div class="cell" id="6"></div>
         <div class="cell" id="7"></div>
         <div class="cell" id="8"></div>
+        <div class="cell" id="9"></div>
       </div>
     </div>
   </div>
 
   <script>
-    const inputSection = document.querySelector('#inputdata');
+    const submitButton = document.getElementById('submit');
+    const inputSection = document.getElementById('inputdata');
     const gameSection = document.querySelector('.game-section');
     const messageElement = document.getElementById('message');
 
     let players = [];
     let currentPlayer = 0;
-    let board = Array(9).fill(null);
+    let board = Array(10).fill(null); // indices 1–9
     let winnerdata = null;
 
     const winningCombination = [
-      [0,1,2],[3,4,5],[6,7,8],
-      [0,3,6],[1,4,7],[2,5,8],
-      [0,4,8],[2,4,6]
+      [1,2,3],[4,5,6],[7,8,9],
+      [1,4,7],[2,5,8],[3,6,9],
+      [1,5,9],[3,5,7]
     ];
 
-    function handleCellClick(index) {
-      if (board[index] || checkWinner()) return;
+    function handleCellClick(index){
+      if(board[index] || checkWinner()) return;
 
-      board[index] = currentPlayer === 0 ? 'X' : 'O';
+      board[index] = currentPlayer === 0 ? 'x' : 'o';
       document.getElementById(index).textContent = board[index];
 
-      if (checkWinner()) {
+      if(checkWinner()){
         messageElement.textContent = `${players[currentPlayer]} congratulations you won!`;
         winnerdata.forEach(i => {
-          document.getElementById(`${i}`).style.backgroundColor = "violet";
+          document.getElementById(i).style.backgroundColor = "violet";
         });
-      } else if (board.every(cell => cell)) {
+      } else if(board.slice(1).every(cell => cell)){
         messageElement.textContent = "It's a Draw!";
       } else {
         currentPlayer = 1 - currentPlayer;
@@ -127,33 +107,35 @@
     }
 
     function checkWinner() {
-      const symbol = currentPlayer === 0 ? 'X' : 'O';
+      const symbol = currentPlayer === 0 ? 'x' : 'o';
       return winningCombination.some(combination => {
-        if (combination.every(i => board[i] === symbol)) {
-          winnerdata = combination;
+        if (combination.every(index => board[index] === symbol)) {
+          winnerdata = combination; 
           return true;
         }
         return false;
       });
     }
 
-    document.getElementById("submit").addEventListener("click", () => {
-      const player1 = document.getElementById("player-1").value.trim();
-      const player2 = document.getElementById("player-2").value.trim();
+    submitButton.addEventListener('click', () => {
+      const player1 = document.getElementById('player1').value.trim();
+      const player2 = document.getElementById('player2').value.trim();
 
-      if (!player1 || !player2) return;
+      if(!player1 || !player2) return; 
 
       players = [player1, player2];
       currentPlayer = 0;
       board.fill(null);
       winnerdata = null;
 
-      // Reset board
-      for (let i = 0; i < 9; i++) {
-        const cell = document.getElementById(i);
-        cell.textContent = "";
-        cell.style.backgroundColor = "white";
-        cell.onclick = () => handleCellClick(i);
+      // reset board
+      for(let i = 1; i <= 9; i++){
+        const oldCell = document.getElementById(i);
+        const newCell = oldCell.cloneNode(true);
+        newCell.textContent = '';
+        newCell.style.backgroundColor = '';
+        oldCell.parentNode.replaceChild(newCell, oldCell);
+        newCell.addEventListener('click', () => handleCellClick(i));
       }
 
       inputSection.style.display = "none";
